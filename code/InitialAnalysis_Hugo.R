@@ -28,7 +28,7 @@ summary(water[,2:10])
 describe(water[,2:10])
 round(var(water[,2:10]),3)
 round(cov(water[,2:10]),3)
-round(cor(water),3)
+round(cor(water[,2:11]),3)
 
 ## Data visualization
 
@@ -88,7 +88,7 @@ d<-sort(d)
 qqPlot(d,distribution = "chisq",df=ncol(water[,2:10]),main="Quantile-quantile plot of mahalanobis distance",pch=20,col="red")
 
 
-#Mardia's Multivariate Normality test
+#Mardia's Multivariate Normality test (null hypotesis: the dataset follows a MVN distribuition)
 mvn(data = water[,2:10], mvnTest = "mardia")
 
 #Henze-Zirkler Multivariate Normality test
@@ -98,4 +98,4 @@ mvn(data = water[,2:10], mvnTest = "hz")
 mvn(data = water[,2:10], mvnTest = "dh")
 
 # Energy test
-mvnorm.etest(water[,2:10], R=100)
+mvn(data = water[,2:10], mvnTest = "dh", multivariatePlot='qq')
