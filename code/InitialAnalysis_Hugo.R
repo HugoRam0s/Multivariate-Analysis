@@ -11,6 +11,9 @@ library(car)
 ## Read dataset
 diabetes <- read_csv('C:/Users/hugof/Downloads/diabetes_012_health_indicators_BRFSS2015.csv',show_col_types = FALSE)
 
+#Remove duplicate rows
+diabetes <- diabetes[!duplicated(diabetes), ]
+
 ## Basic statistic analysis in tables
 
 summary(diabetes[,2:22])
@@ -43,12 +46,9 @@ ggpairs(diabetes[,2:22], ggplot2::aes(colour=diabetes$Diabetes_012))
 
 ggcorr(diabetes, method = c("everything", "pearson"))
 
-#Remove duplicate rows
-diabetes_u <- diabetes[!duplicated(diabetes), ]
-
 #Remove low correlation variables
 cor_matrix <- cor(diabetes_u)
-column_ids <- which(abs(cor_matrix[1,]) > 0.2)
+column_ids <- which(abs(cor_matrix[1,]) > 0.1)
 diabetes_filt <- diabetes_u[,column_ids]
 
 ## Checking for normality 
