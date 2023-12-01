@@ -9,9 +9,7 @@ library(mvtnorm)
 library(car)
 
 ## Read dataset
-diabetes2 <- read_csv('C:/Users/hugof/Downloads/diabetes_012_health_indicators_BRFSS2015.csv',show_col_types = FALSE)
-diabetes <- read_csv("C:/Users/hugof/Downloads/diabetes_binary_5050split_health_indicators_BRFSS2015.csv",show_col_types = FALSE)
-diabetes3 <- read_csv("C:/Users/hugof/Downloads/diabetes_binary_health_indicators_BRFSS2015.csv",show_col_types = FALSE)
+diabetes <- read_csv('C:/Users/hugof/Downloads/diabetes_012_health_indicators_BRFSS2015.csv',show_col_types = FALSE)
 
 ## Basic statistic analysis in tables
 
@@ -22,6 +20,14 @@ round(cov(diabetes[,2:22]),3)
 round(cor(diabetes),3)
 
 ## Data visualization
+
+slices <- as.vector(table(diabetes$Diabetes_012))
+lbls <- names(table(diabetes$Diabetes_012))
+pct <- round(slices/sum(slices)*100)
+lbls <- paste(lbls, pct) # add percents to labels
+lbls <- paste(lbls,"%",sep="") # ad % to labels
+pie(slices,labels = lbls, col=rainbow(length(lbls)),
+    main="Diabetes diagnosis")
 
 for(i in names(diabetes[,2:22])){
   hist(diabetes[[i]], main = i, xlab = names(diabetes)[i],breaks=50)
@@ -42,20 +48,10 @@ diabetes_u <- diabetes[!duplicated(diabetes), ]
 
 #Remove low correlation variables
 cor_matrix <- cor(diabetes_u)
-column_ids <- which(abs(cor_matrix[1,]) > 0.1)
+column_ids <- which(abs(cor_matrix[1,]) > 0.2)
 diabetes_filt <- diabetes_u[,column_ids]
 
 ## Checking for normality 
-
-#Comparison between real data and random generated normal multivariate observations
-#n<-10000
-#set.seed(1738)
-#teoric<-rmvnorm(n,colMeans(diabetes[,2:22]), cov(diabetes[,2:22]))
-#colnames(teoric)<-colnames(diabetes[,2:22])
-
-#round(cov(diabetes[,2:22])-cov(teoric),3)
-
-#round(cor(diabetes[,2:22])-cor(teoric),3)
 
 ## Using quantile-quantile plots and mahalanobis distance, multivariate normality tests
 
