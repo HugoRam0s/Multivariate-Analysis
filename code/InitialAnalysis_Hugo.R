@@ -13,7 +13,6 @@ diabetes2 <- read_csv('C:/Users/hugof/Downloads/diabetes_012_health_indicators_B
 diabetes <- read_csv("C:/Users/hugof/Downloads/diabetes_binary_5050split_health_indicators_BRFSS2015.csv",show_col_types = FALSE)
 diabetes3 <- read_csv("C:/Users/hugof/Downloads/diabetes_binary_health_indicators_BRFSS2015.csv",show_col_types = FALSE)
 
-
 ## Basic statistic analysis in tables
 
 summary(diabetes[,2:22])
@@ -37,6 +36,14 @@ diabetes$Potability<-as.factor(diabetes$Diabetes_012)
 ggpairs(diabetes[,2:22], ggplot2::aes(colour=diabetes$Diabetes_012))
 
 ggcorr(diabetes, method = c("everything", "pearson"))
+
+#Remove duplicate rows
+diabetes_u <- diabetes[!duplicated(diabetes), ]
+
+#Remove low correlation variables
+cor_matrix <- cor(diabetes_u)
+column_ids <- which(abs(cor_matrix[1,]) > 0.1)
+diabetes_filt <- diabetes_u[,column_ids]
 
 ## Checking for normality 
 
