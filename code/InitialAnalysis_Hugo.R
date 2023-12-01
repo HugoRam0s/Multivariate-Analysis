@@ -9,7 +9,8 @@ library(mvtnorm)
 library(car)
 
 ## Read dataset
-diabetes <- read_csv('C:/Users/hugof/Downloads/diabetes_012_health_indicators_BRFSS2015.csv',show_col_types = FALSE)
+diabetes <- read_csv("C:/Users/hugof/OneDrive/Documentos/GitHub/Multivariate-Analysis/data/processed/preprocessed_data_diabetes.csv",show_col_types = FALSE)
+diabetes <- diabetes[,2:23]
 
 #Remove duplicate rows
 diabetes <- diabetes[!duplicated(diabetes), ]
@@ -36,13 +37,13 @@ for(i in names(diabetes[,2:22])){
   hist(diabetes[[i]], main = i, xlab = names(diabetes)[i],breaks=50)
 }
 
-pairs.panels(diabetes[,2:22], smooth = FALSE, scale = FALSE, density=TRUE,
+pairs.panels(diabetes[,17:22], smooth = FALSE, scale = FALSE, density=TRUE,
              ellipses=FALSE,digits = 2,hist.col="green")
 
-ggpairs(diabetes[,2:22], title="Correlogram")
+ggpairs(diabetes[,17:22], title="Correlogram")
 
-diabetes$Potability<-as.factor(diabetes$Diabetes_012)
-ggpairs(diabetes[,2:22], ggplot2::aes(colour=diabetes$Diabetes_012))
+diabetes$Diabetes_012<-as.factor(diabetes$Diabetes_012)
+ggpairs(diabetes[,17:22], ggplot2::aes(colour=diabetes$Diabetes_012))
 
 ggcorr(diabetes, method = c("everything", "pearson"))
 
