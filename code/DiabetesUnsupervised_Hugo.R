@@ -20,12 +20,15 @@ diab[cols.ch] <- sapply(diab[cols.ch],as.character)
 diab_sc<-diab %>% mutate(across(where(is.numeric), scale))
 
 split<- splitmix(diab)
-pca.famd <- FAMD(diab, ncp = 10, graph = FALSE) 
-get_eigenvalue(pca.famd)
-fviz_screeplot(pca.famd)
-pca.Pcamix <- PCAmix(X.quanti = split$X.quanti, X.quali = split$X.quali, ndim=10, rename.level = TRUE)
+#pca.famd <- FAMD(diab, ncp = 10, graph = FALSE) 
+#get_eigenvalue(pca.famd)
+#fviz_screeplot(pca.famd)
+pca.Pcamix <- PCAmix(X.quanti = split$X.quanti, X.quali = split$X.quali, ndim=14, rename.level = TRUE)
 pca.Pcamix$eig
 diab_PCA <- pca.Pcamix$ind$coord
+diabetes_PCA <- cbind(diabetes$Diabetes_012,diab_PCA)
+colnames(diabetes_PCA)[1] ="Diabetes_012"
+
 
 ## Clustering methods (K-prototypes/K-means, Hierarchical Clustering, Mixture models, DBSCAN, OPTICS)
 
