@@ -202,8 +202,8 @@ gower_dist <- distmix(diab_long, method = "gower", idnum = split$col.quant, idbi
 gower_kmed <- fastkmed(gower_dist,ncluster = 3,iterate = 5)
 cluster_assignments_kmed5 <- gower_kmed$cluster-1
 Kmedoids_score5 <- (sum(diabetes_long$Diabetes_012 == cluster_assignments_kmed5)/nrow(diabetes_long))
-#contingency_table <- table(gower_kmed$clustering, diabetes$Diabetes_012)
-#print(contingency_table)
+contingency_table <- table(gower_kmed$cluster, diabetes$Diabetes_012)
+print(contingency_table)
 
 # Agglomerative clustering methods - too expensive
 
@@ -218,33 +218,8 @@ Kmedoids_score5 <- (sum(diabetes_long$Diabetes_012 == cluster_assignments_kmed5)
 #a1_eu<-agnes(diab, metric = "euclidean",
                   #stand = FALSE, method = "single", keep.data = FALSE)
 
-# DBSCAN on the original dataset
-# Calculate k-distance plot
-k_distances <- kNNdistplot(diab_long, k = 10)  # eps =
-abline(h = 3.5, lty = 2)
+# DBSCAN
 
-# Evaluate MinPts for different values
-minPts_values <- 1:10  # Try different MinPts values
-num_clusters <- numeric(length(minPts_values))
-
-for (i in seq_along(minPts_values)) {
-  dbscan_result <- dbscan(diab_long, eps = 3.5, MinPts = minPts_values[i])
-  num_clusters[i] <- length(unique(dbscan_result$cluster[dbscan_result$cluster != 0]))
-}
-
-# Plot the number of clusters for different MinPts values
-plot(minPts_values, num_clusters, type = "b", xlab = "MinPts", ylab = "Number of Clusters") #MinPts=3
-# Choose the MinPts value where the number of clusters stabilizes or meets your criteria
-
-dbscan_result1 <- dbscan(diab_long, eps = 3.5, MinPts = 3)
-diab_long$cluster <- dbscan_result1$cluster
-fviz_cluster(list(data = diab_long[, -which(names(diab_long) == "cluster")], cluster = diab_long$cluster))
-scatterplot3d(as.numeric(unlist(diab[, 1])), as.numeric(unlist(diab[, 2])), as.numeric(unlist(diab[, 3])), color = dbscan_result$cluster, pch = 19, main = "DBSCAN Clusters")
-contingency_table <- table(diab_long$cluster, diabetes$Diabetes_012)
-print(contingency_table)
-diab_long <- diabetes_long[,3:23]
-
-# DBSCAN on the dimension reduced dataset
 # Calculate k-distance plot
 k_distances <- kNNdistplot(diab, k = 10)  # eps =3.5
 abline(h = 3.5, lty = 2)
@@ -262,8 +237,8 @@ for (i in seq_along(minPts_values)) {
 plot(minPts_values, num_clusters, type = "b", xlab = "MinPts", ylab = "Number of Clusters") #MinPts=3
 # Choose the MinPts value where the number of clusters stabilizes or meets your criteria
 
-dbscan_result2 <- dbscan(diab, eps = 3.5, MinPts = 3)
-diab$cluster <- dbscan_result2$cluster
+dbscan_result <- dbscan(diab, eps = 3.5, MinPts = 3)
+diab$cluster <- dbscan_result$cluster
 fviz_cluster(list(data = diab[, -which(names(diab) == "cluster")], cluster = diab$cluster))
 scatterplot3d(as.numeric(unlist(diab[, 1])), as.numeric(unlist(diab[, 2])), as.numeric(unlist(diab[, 3])), color = dbscan_result$cluster, pch = 19, main = "DBSCAN Clusters")
 contingency_table <- table(diab$cluster, diabetes$Diabetes_012)
