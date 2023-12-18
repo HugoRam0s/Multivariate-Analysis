@@ -187,36 +187,23 @@ print(contingency_table)
 diab <- diabetes[,2:15]
 
 set.seed(123)  # For reproducibility
-kmedoids4 <- pam(diab,3,metric="manhattan",stand=FALSE)
-cluster_assignments_kmed4 <- kmedoids4$clustering-1
+kmedoids4 <- pam(diab,3,metric="manhattan",stand=FALSE) #PAM using manhattan dissimilarity
+cluster_assignments_kmed4 <- kmedoids4$clustering-1 #Transform 1,2,3 to 0,1,2
 Kmedoids_score4 <- (sum(diabetes$Diabetes_012 == cluster_assignments_kmed4)/nrow(diabetes))
 diab$cluster <- kmedoids4$cluster-1
-fviz_cluster(list(data = diab[, -which(names(diab) == "cluster")], cluster = diab$cluster))
-contingency_table <- table(kmedoids4$clustering, diabetes$Diabetes_012)
+fviz_cluster(list(data = diab[, -which(names(diab) == "cluster")], cluster = diab$cluster)) #Score correspondence between clusters and ground truth
+contingency_table <- table(kmedoids4$clustering, diabetes$Diabetes_012)#Contingency table to check correspondence
 print(contingency_table)
 diab <- diabetes[,2:15]
 
 # K-medoids on the original dataset using gower distance
 split<- splitmix(diab_long)  #Get binary and numeric variables
-gower_dist <- distmix(diab_long, method = "gower", idnum = split$col.quant, idbin = split$col.qual)
-gower_kmed <- fastkmed(gower_dist,ncluster = 3,iterate = 5)
-cluster_assignments_kmed5 <- gower_kmed$cluster-1
+gower_dist <- distmix(diab_long, method = "gower", idnum = split$col.quant, idbin = split$col.qual) #Get gower distance
+gower_kmed <- fastkmed(gower_dist,ncluster = 3,iterate = 5) # Apply k-medoids
+cluster_assignments_kmed5 <- gower_kmed$cluster-1 #Transform 1,2,3 to 0,1,2
 Kmedoids_score5 <- (sum(diabetes_long$Diabetes_012 == cluster_assignments_kmed5)/nrow(diabetes_long))
-contingency_table <- table(gower_kmed$cluster, diabetes$Diabetes_012)
+contingency_table <- table(gower_kmed$cluster, diabetes$Diabetes_012) #Contigency table to check correspondences
 print(contingency_table)
-
-# Agglomerative clustering methods - too expensive
-
-#cols.ch <- c("HighBP","HighChol",'CholCheck', 'Smoker', 'Stroke','HeartDiseaseorAttack','PhysActivity','Fruits','Veggies','HvyAlcoholConsump','AnyHealthcare','NoDocbcCost','DiffWalk','Sex')
-#diab_long[cols.ch] <- sapply(diab_long[cols.ch],as.character)
-#diab_long[,c(4,14,15,16,19,20,21)] <- scale(diab_long[,c(4,14,15,16,19,20,21)])
-#split<- splitmix(diab_long)
-#pca.Pcamix <- PCAmix(X.quanti = split$X.quanti, X.quali = split$X.quali, ndim=3, rename.level = TRUE)
-#pca.Pcamix$eig
-#diab_PCA <- pca.Pcamix$ind$coord
-
-#a1_eu<-agnes(diab, metric = "euclidean",
-                  #stand = FALSE, method = "single", keep.data = FALSE)
 
 # DBSCAN
 
@@ -237,33 +224,28 @@ for (i in seq_along(minPts_values)) {
 plot(minPts_values, num_clusters, type = "b", xlab = "MinPts", ylab = "Number of Clusters") #MinPts=3
 # Choose the MinPts value where the number of clusters stabilizes or meets your criteria
 
-dbscan_result <- dbscan(diab, eps = 3.5, MinPts = 3)
+dbscan_result <- dbscan(diab, eps = 3.5, MinPts = 3) #Apply DBSCAN
 diab$cluster <- dbscan_result$cluster
-fviz_cluster(list(data = diab[, -which(names(diab) == "cluster")], cluster = diab$cluster))
-scatterplot3d(as.numeric(unlist(diab[, 1])), as.numeric(unlist(diab[, 2])), as.numeric(unlist(diab[, 3])), color = dbscan_result$cluster, pch = 19, main = "DBSCAN Clusters")
-contingency_table <- table(diab$cluster, diabetes$Diabetes_012)
+fviz_cluster(list(data = diab[, -which(names(diab) == "cluster")], cluster = diab$cluster)) #Visualize cluster assignment along the most significant dimensions
+contingency_table <- table(diab$cluster, diabetes$Diabetes_012)#Contigency table to check dimensions
 print(contingency_table)
 diab <- diabetes[,2:15]
 
-# OPTICS encontra demasiados clusters
+# OPTICS - finds too many clusters, not used
 
-optics_result <- optics(diab, eps = 3.5, minPts = 3)
-opt <- extractDBSCAN(optics_result, eps_cl = 1.5)
-plot(opt)
-
-# Mean shift Não funciona não percebo porquê
-
-MN_result <- meanShift(diab, algorithm="KDTREE", alpha=0, iterations = 100)
+optics_result <- optics(diab, eps = 3.5, minPts = 3) #Apply OPTICS with the same parameters as DBSCAN
+opt <- extractDBSCAN(optics_result, eps_cl = 1.5) #Extract cluster assignments
+plot(opt) #Visualize cluster assignments
 
 # Gaussian mixture models
 
-gmm_result <- Mclust(diab)
+gmm_result <- Mclust(diab) #Apply gaussian mixture model clustering
 summary(gmm_result,parameters=TRUE)
 diab$cluster <- gmm_result$classification
-contingency_table <- table(diab$cluster, diabetes$Diabetes_012)
+contingency_table <- table(diab$cluster, diabetes$Diabetes_012) #Conteigency table to check correspondences
 print(contingency_table)
 diab <- diabetes[,2:15]
-plot(gmm_result, what = "classification")
+plot(gmm_result, what = "classification") #Visualize cluster assignments in all dimensions 2D
 
 # Export the best clustering technique ---> k-medoids in the original dataset
 
